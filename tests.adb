@@ -40,7 +40,7 @@ begin
    Check ("4.1 Empty key handled", HMAC (To_Bytes (""), To_Bytes ("msg"))'Length = 32);
    Check ("4.2 Empty msg handled", HMAC (To_Bytes ("key"), To_Bytes (""))'Length = 32);
    declare
-      Long_Key : constant Byte_Array (1 .. 100) := (others => 16#AA#);
+      Long_Key : constant Byte_Array (1 .. 100) := [others => 16#AA#];
    begin
       Check ("4.3 Oversized key collapses safely", HMAC (Long_Key, To_Bytes ("m"))'Length = 32);
    end;
@@ -84,7 +84,7 @@ begin
 
    begin
       declare
-         Bad_Iter : constant Integer := 0;
+         Bad_Iter : constant Integer := Integer'Value ("0");
          Dummy    : Natural;
       begin
          Dummy := PBKDF2 (To_Bytes ("p"), To_Bytes ("s"), Positive (Bad_Iter), 32)'Length;
@@ -97,7 +97,7 @@ begin
 
    begin
       declare
-         Bad_Len : constant Integer := 0;
+         Bad_Len : constant Integer := Integer'Value ("0");
          Dummy   : Natural;
       begin
          Dummy := PBKDF2 (To_Bytes ("p"), To_Bytes ("s"), 1, Positive (Bad_Len))'Length;
@@ -172,7 +172,7 @@ begin
 
    begin
       declare
-         Bad_Len : constant Integer := 0;
+         Bad_Len : constant Integer := Integer'Value ("0");
          Dummy   : Natural;
       begin
          Dummy := HKDF_Expand (To_Bytes ("adequate_prk_length_string_here_32"), To_Bytes ("i"), Positive (Bad_Len))'Length;
@@ -204,7 +204,7 @@ begin
    -- TEST 14 - Mixed Empty Array Edge Cases
    Put_Line ("TEST 14 — Mixed Edge Cases");
    declare
-      Null_Bytes : constant Byte_Array (1 .. 0) := (others => 0);
+      Null_Bytes : constant Byte_Array (1 .. 0) := [others => 0];
    begin
       Check ("14.1 PBKDF2 tolerates empty salt explicitly", PBKDF2 (To_Bytes ("p"), Null_Bytes, 1, 16)'Length = 16);
       Check ("14.2 PBKDF2 tolerates empty password", PBKDF2 (Null_Bytes, To_Bytes ("s"), 1, 16)'Length = 16);
