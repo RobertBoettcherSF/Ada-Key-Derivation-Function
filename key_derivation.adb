@@ -21,7 +21,7 @@ package body Key_Derivation is
    -- Simulated cryptographic Hash function (32-byte output)
    -- Provides basic avalanche effect for self-contained demonstration.
    function Hash (Message : Byte_Array) return Byte_Array is
-      Result : Byte_Array (1 .. Hash_Output_Length) := (others => 16#C5#);
+      Result : Byte_Array (1 .. Hash_Output_Length) := [others => 16#C5#];
       Prime  : constant Byte := 16#3D#;
    begin
       if Message'Length > 0 then
@@ -42,7 +42,7 @@ package body Key_Derivation is
    -- Standard HMAC construction using the local Hash function
    function HMAC (Key : Byte_Array; Message : Byte_Array) return Byte_Array is
       Block_Size   : constant Positive := 64;
-      Actual_Key   : Byte_Array (1 .. Block_Size) := (others => 0);
+      Actual_Key   : Byte_Array (1 .. Block_Size) := [others => 0];
       O_Pad, I_Pad : Byte_Array (1 .. Block_Size);
    begin
       -- Shorten long keys via hash
@@ -118,7 +118,7 @@ package body Key_Derivation is
    begin
       -- If salt is empty, use an array of zeros as salt (per RFC 5869)
       if Salt'Length = 0 then
-         return HMAC (Byte_Array'(1 .. Hash_Output_Length => 0), IKM);
+         return HMAC (Byte_Array'[1 .. Hash_Output_Length => 0], IKM);
       else
          return HMAC (Salt, IKM);
       end if;
@@ -147,13 +147,13 @@ package body Key_Derivation is
          Last_T : Byte_Array (1 .. Hash_Output_Length);
       begin
          -- T(1) = HMAC(PRK, Info | 0x01)
-         Last_T := HMAC (PRK, Info & Byte_Array'(1 => Counter));
+         Last_T := HMAC (PRK, Info & Byte_Array'[1 => Counter]);
          Result (1 .. Hash_Output_Length) := Last_T;
          Counter := Counter + 1;
 
          -- T(N) = HMAC(PRK, T(N-1) | Info | N)
          for I in 2 .. Blocks_Needed loop
-            Last_T := HMAC (PRK, Last_T & Info & Byte_Array'(1 => Counter));
+            Last_T := HMAC (PRK, Last_T & Info & Byte_Array'[1 => Counter]);
             Result ((I - 1) * Hash_Output_Length + 1 .. I * Hash_Output_Length) := Last_T;
             Counter := Counter + 1;
          end loop;
